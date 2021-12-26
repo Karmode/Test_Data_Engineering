@@ -1,0 +1,16 @@
+-- Crear tabla
+CREATE TABLE agrupacion_por_pais AS
+SELECT 
+	b.pais_tratado, 
+	count(nullif(b.vigente, false)) as vigentes,
+	count(nullif(b.vigente, true)) as no_vigentes,
+	min(b.fecha_adopción) as primer_fecha,
+	(date_part ('year', age (now()::DATE, min(b.fecha_adopción))) * 12 
+	 + date_part ('month', age (now()::DATE, min(b.fecha_adopción)))) as meses
+FROM tratadosintern b
+INNER JOIN(SELECT v.pais_tratado FROM tratadosintern v WHERE v.vigente = True GROUP BY pais_tratado) bu
+ON b.pais_tratado = bu.pais_tratado
+GROUP BY b.pais_tratado; 
+
+-- Ver tabla
+SELECT * FROM agrupacion_por_pais
